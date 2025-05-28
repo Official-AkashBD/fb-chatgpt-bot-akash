@@ -1,0 +1,14 @@
+{
+  "name": "fb-chatgpt-bot-akash-khan",
+  "version": "1.0.0",
+  "description": "Facebook personal ID ChatGPT auto-reply bot by Akash Khan",
+  "author": "Akash Khan",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.7",
+    "facebook-chat-api": "^1.6.0"
+  }
+}
