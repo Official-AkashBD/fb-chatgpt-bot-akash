@@ -1,0 +1,28 @@
+name: Run Facebook ChatGPT Bot
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Decode session and save
+      run: |
+        echo "${{ secrets.FB_SESSION }}" | base64 -d > session.json
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Start the bot
+      run: node index.js
