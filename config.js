@@ -1,4 +1,4 @@
-// config.js
-module.exports = {
-  OPENAI_API_KEY: "sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-};
+{
+  "email": "www.Md.milad.net@gmail.com",
+  "password": "Milad@143"
+}
