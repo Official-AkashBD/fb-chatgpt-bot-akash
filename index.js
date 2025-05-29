@@ -1,50 +1,33 @@
-// 📁 Project: Facebook Personal ID ChatGPT Bot (Unofficial)
-
 const login = require("facebook-chat-api");
-const axios = require("axios");
 const fs = require("fs");
 
-const appState = require("./session.json"); // Keep this file secret!
+// ✅ তোর দেওয়া Base64 appState
+const base64AppState = `WwogICAgewogICAgICAgICJrZXkiOiAiZGJsbiIsCiAgICAgICAgInZhbHVlIjogIiU3QiUyMjEwMDAxMTA5OTI4OTY0MCUyMiUzQ...==`; // সংক্ষিপ্ত করছি, পুরাটা বসিয়ে নিস
 
-const OPENAI_API_KEY = require("./config.js").OPENAI_API_KEY;
+// 🔓 Base64 ডিকোড করে appState.json বানায়
+const appStateData = Buffer.from(base64AppState, "base64").toString("utf8");
+fs.writeFileSync("appState.json", appStateData);
 
-async function askChatGPT(message) {
-  try {
-    const res = await axios.post(
-      "https://api.openai.com/v1/chat/completions",
-      {
-        model: "gpt-3.5-turbo",
-        messages: [
-          { role: "system", content: "You are a helpful assistant in Bengali." },
-          { role: "user", content: message }
-        ]
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${OPENAI_API_KEY}`,
-          "Content-Type": "application/json"
-        }
-      }
-    );
-    return res.data.choices[0].message.content.trim();
-  } catch (err) {
-    console.error("OpenAI error:", err.response?.data || err);
-    return "দুঃখিত, আমি এখন উত্তর দিতে পারছি না। পরে আবার চেষ্টা করুন।";
+// 🔄 commands.json থেকে কমান্ড লোড করে
+const commands = JSON.parse(fs.readFileSync("commands.json", "utf8"));
+
+// 🤖 Facebook bot লগইন করে
+login({ appState: JSON.parse(appStateData) }, (err, api) => {
+  if (err) {
+    console.error("❌ লগইন সমস্যা:", err);
+    return;
   }
-}
 
-login({ appState }, (err, api) => {
-  if (err) return console.error(err);
-  console.log("🤖 Facebook ChatGPT Bot is running...");
+  console.log("✅ Bot চালু হয়েছে! এখন ম্যাসেজ আসলেই রিপ্লাই দেবে।");
 
-  api.listenMqtt(async (err, message) => {
+  api.listenMqtt((err, message) => {
     if (err) return console.error(err);
 
-    if (message.type === "message" && message.body) {
-      console.log("📩 Message from:", message.senderID);
-      console.log("📨 Text:", message.body);
+    const text = message.body?.toLowerCase();
+    if (!text) return;
 
-      const reply = await askChatGPT(message.body);
+    const reply = commands[text];
+    if (reply) {
       api.sendMessage(reply, message.threadID);
     }
   });
