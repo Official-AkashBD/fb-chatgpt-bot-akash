@@ -1,1 +1,5 @@
-
+{
+  "hello": "Hi there!",
+  "bye": "Goodbye! Take care 😊",
+  "status": "I am alive and running!"
+}
